@@ -91,3 +91,81 @@ FROM payment
 WHERE staff_id = 2
 GROUP BY customer_id, staff_id
 HAVING SUM(amount) > 100;
+
+-- How many payment transactions were greater than $5.00?
+
+SELECT count(*)
+FROM payment
+WHERE amount > 5.00;
+
+-- How many actors have a first name that starts with the letter 'P'?
+
+SELECT count(*)
+FROM actor
+WHERE first_name LIKE 'P%';
+
+-- How many unique distrcits are our customers from?
+
+SELECT COUNT(DISTINCT(district))
+FROM address;
+
+-- Now retrieve the list of names for the distinct districts.
+
+SELECT DISTINCT(district)
+FROM address;
+
+-- How many films have a rating of R and a replacement cost between $5 and $15?
+
+SELECT COUNT(*)
+FROM film
+WHERE rating = 'R' 
+AND replacement_cost BETWEEN 5.00 AND 15.00;
+
+-- How many films have the word "Truman" somewhere in the title?
+
+SELECT COUNT(*)
+FROM film
+WHERE title ILIKE '%truman%';
+
+-- California sales tax laws have changed and we need to alert our customers to this through email. What are the emails of the customers who live in California?
+
+SELECT customer.email, customer.first_name, customer.last_name, address.district
+FROM customer
+INNER JOIN address
+ON customer.address_id = address.address_id
+WHERE district = 'California';
+
+-- A customer walks in and is a huge fan of the actor "Nick Wahlberg" and wants to know which movies he is in. Get a list of all the movies "Nick Wahlberg" has been in.
+
+SELECT film.title, actor.first_name, actor.last_name, film_actor.actor_id
+FROM film
+FULL OUTER JOIN film_actor
+ON film.film_id = film_actor.film_id
+FULL OUTER JOIN actor 
+ON film_actor.actor_id = actor.actor_id
+WHERE actor.first_name = 'Nick' AND actor.last_name = 'Wahlberg';
+
+-- We want to know and compare the various amounts of films we have per movie rating. 
+
+SELECT 
+SUM (CASE rating
+		WHEN 'NC-17' THEN 1
+	 	ELSE 0
+	 END) as NC17,
+SUM (CASE rating
+		WHEN 'G' THEN 1
+		ELSE 0
+	END) as G,
+SUM (CASE rating
+		WHEN 'PG-13' THEN 1
+		ELSE 0
+	END) as PG13,
+SUM (CASE rating
+		WHEN 'R' THEN 1
+		ELSE 0
+	END) as R,
+SUM (CASE rating
+		WHEN 'PG' THEN 1
+		ELSE 0
+	END) as PG
+FROM film
